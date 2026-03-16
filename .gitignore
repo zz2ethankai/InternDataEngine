@@ -1,0 +1,16 @@
+__pycache__
+build
+debug
+dist
+*.egg
+.vscode
+output
+*.err
+*.out
+.cursor
+assets
+curobo
+panda_drake
+tests/*.log
+tests/*.txt
+polygons.png
