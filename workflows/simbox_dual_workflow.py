@@ -87,21 +87,22 @@ class SimBoxDualWorkFlow(NimbusWorkFlow):
 
         for obj_cfg in self.task_cfg["objects"]:
             if obj_cfg["target_class"] == "ArticulatedObject":
-                asset_root = self.task_cfg["asset_root"]
-                art_paths = glob.glob(os.path.join(asset_root, obj_cfg["art_cat"], "*"))
-                art_paths.sort()
-                path = random.choice(art_paths)
-                info_name = obj_cfg["info_name"]
-                info_path = f"{path}/Kps/{info_name}/info.json"
-                with open(info_path, "r", encoding="utf-8") as f:
-                    info = json.load(f)
-                scale = info["object_scale"][:3]
+                if obj_cfg.get("apply_randomization", False):
+                    asset_root = self.task_cfg["asset_root"]
+                    art_paths = glob.glob(os.path.join(asset_root, obj_cfg["art_cat"], "*"))
+                    art_paths.sort()
+                    path = random.choice(art_paths)
+                    info_name = obj_cfg["info_name"]
+                    info_path = f"{path}/Kps/{info_name}/info.json"
+                    with open(info_path, "r", encoding="utf-8") as f:
+                        info = json.load(f)
+                    scale = info["object_scale"][:3]
 
-                obj_cfg["path"] = path.replace(f"{asset_root}/", "", 1)
-                obj_cfg["category"] = path.split("/")[-2]
-                obj_cfg["obj_info_path"] = info_path.replace(f"{asset_root}/", "", 1)
-                obj_cfg["scale"] = scale
-                self.task_cfg["data"]["collect_info"] = obj_cfg["category"]
+                    obj_cfg["path"] = path.replace(f"{asset_root}/", "", 1) + "/instance.usd"
+                    obj_cfg["category"] = path.split("/")[-2]
+                    obj_cfg["obj_info_path"] = info_path.replace(f"{asset_root}/", "", 1)
+                    obj_cfg["scale"] = scale
+                    self.task_cfg["data"]["collect_info"] = obj_cfg["category"]
 
         self.task_cfg.pop("arena_file", None)
         self.task_cfg.pop("camera_file", None)

@@ -108,17 +108,11 @@ def update_articulated_objs(cfg):
     for obj_cfg in cfg["objects"]:
         apply_randomization = obj_cfg.get("apply_randomization", False)
         if apply_randomization and obj_cfg["target_class"] == "ArticulatedObject":
-            dirs = os.path.join(cfg["asset_root"], os.path.dirname(obj_cfg["path"]))
+            dirs = os.path.join(cfg["asset_root"], os.path.dirname(os.path.dirname(obj_cfg["path"])))
             paths = glob.glob(os.path.join(dirs, "*"))
             paths.sort()
             path = random.choice(paths)
 
-            # left hearth 0.5: [1, 2, 5, 6, 13, ] ;
-            # left hearth 0.785 [3, 4, 7, 8, 9, 11, 12, 14, 15, 16, 17]
-            # left hearth no planning [0, 10, 18, 19]
-
-            # right hearth 0.5: [0, 1, 4, 10, 11]
-            # right hearth 0.785: [2, 3, 5, 6, 7, 8, 9, ]
             info_name = obj_cfg["info_name"]
             info_path = f"{path}/Kps/{info_name}/info.json"
             with open(info_path, "r", encoding="utf-8") as file:
@@ -126,7 +120,7 @@ def update_articulated_objs(cfg):
             scale = info["object_scale"][:3]
             asset_root = cfg["asset_root"]
 
-            obj_cfg["path"] = path.replace(f"{asset_root}/", "", 1)
+            obj_cfg["path"] = path.replace(f"{asset_root}/", "", 1) + "/instance.usd"
             obj_cfg["category"] = path.split("/")[-2]
             obj_cfg["obj_info_path"] = info_path.replace(f"{asset_root}/", "", 1)
             obj_cfg["scale"] = scale

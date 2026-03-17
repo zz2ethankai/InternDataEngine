@@ -19,15 +19,16 @@ class ArticulatedObject(Articulation):
     def __init__(self, asset_root, root_prim_path, cfg, *args, **kwargs):
         self.asset_root = asset_root
         self.object_name = cfg["name"]
-        self.asset_relative_path = cfg["path"]
-        self.object_dir = os.path.join(asset_root, cfg["path"])
+        self.usd_path = os.path.join(asset_root, cfg["path"])
         self._root_prim_path = root_prim_path
-        object_info_path = os.path.join(asset_root, cfg["obj_info_path"])
+        info_name = cfg["info_name"]
+        object_info_path = self.usd_path.replace("instance.usd", f"Kps/{info_name}/info.json")
         with open(object_info_path, "r", encoding="utf-8") as f:
             object_info = json.load(f)
         self.category = cfg["category"]
         self.cfg = cfg
         self.get_articulated_info(object_info)
+        self.cfg["scale"] = self.object_scale[:3]
         super().__init__(prim_path=self.object_prim_path, name=cfg["name"], *args, **kwargs)
 
     def update_articulated_info(self, obj_info_path):
@@ -81,7 +82,6 @@ class ArticulatedObject(Articulation):
         for key, item in self.object_keypoints.items():
             self.object_keypoints[key] = np.append(item, [1.0], axis=0)
         self.object_scale = np.array(object_info["object_scale"])
-        self.object_usd = os.path.join(self.object_dir, "instance.usd")
         for key, item in object_info.items():
             if key in prim_path_list:
                 setattr(self, key, self._root_prim_path + object_info[key])
@@ -96,7 +96,7 @@ class ArticulatedObject(Articulation):
         self.object_joint_number = 0
         # Contact plane normal
         self.contact_plane_normal = None
-        add_reference_to_stage(usd_path=self.object_usd, prim_path=self.object_prim_path)
+        add_reference_to_stage(usd_path=self.usd_path, prim_path=self.object_prim_path)
 
     def get_joint_position(self, stage):
         joint_parent_prim = stage.GetPrimAtPath(self.object_joint_path.rsplit("/", 1)[0])
