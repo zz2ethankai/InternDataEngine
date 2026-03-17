@@ -33,9 +33,9 @@ InternDataEngine is a synthetic data generation engine for embodied AI that powe
 
 ## 🚀 Quickstart
 
-Please refer to the [Installation](TBD) and [Usage](TBD) to start the installation and run your first synthetic data generation task.
+Please refer to the [Installation](https://internrobotics.github.io/InternDataEngine-Docs/guides/installation.html) and [Usage](https://internrobotics.github.io/InternDataEngine-Docs/guides/quickstart.html) to start the installation and run your first synthetic data generation task.
 
-For more details, please check [Documentation](TBD).
+For more details, please check [Documentation](https://internrobotics.github.io/InternDataEngine-Docs/).
 
 ## License and Citation
 All the code within this repo are under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/). Please consider citing our papers if it helps your research.
