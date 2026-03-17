@@ -14,3 +14,5 @@ panda_drake
 tests/*.log
 tests/*.txt
 polygons.png
+_isaac_sim_410
+InterDataEngine-docs
