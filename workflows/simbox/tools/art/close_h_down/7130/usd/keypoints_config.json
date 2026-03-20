@@ -1,5 +1,5 @@
 {
-    "DIR": "/home/shixu/dev_shixu/InternDataEngine/workflows/simbox/tools/art/close_h_down/7130/usd",
+    "DIR": "YOUR_PATH_TO_7130/usd",
     "USD_NAME": "7130.usd",
     "INSTANCE_NAME": "laptop7130",
     "link0_initial_prim_path": "/root/group_1",

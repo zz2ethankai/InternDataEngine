@@ -18,7 +18,7 @@
         1.0
     ],
     "object_name": "laptop7130",
-    "object_usd": "/home/shixu/dev_shixu/InternDataEngine/workflows/simbox/tools/art/close_h_down/7130/usd/instance.usd",
+    "object_usd": "YOUR_PATH_TO_7130/usd/instance.usd",
     "object_link0_rot_axis": "-x",
     "object_link0_contact_axis": "-y",
     "object_base_front_axis": "z",
