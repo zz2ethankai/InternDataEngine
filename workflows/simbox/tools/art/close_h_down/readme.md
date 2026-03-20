@@ -7,8 +7,8 @@ We provide an optimized and simplified annotation pipeline that removes many red
 | Configuration | Example | Description |
 |---------------|---------|-------------|
 | **DIR** | `YOUR_PATH_TO_DIR/usd` | Directory where USD files are stored |
-| **USD_NAME** | `9748.usd` | Scene description file name |
-| **INSTANCE_NAME** | `laptop9748` | Model identifier in the scene. You can name it yourself, preferably matching the generated file name |
+| **USD_NAME** | `7130.usd` | Scene description file name |
+| **INSTANCE_NAME** | `oven7130` | Model identifier in the scene. You can name it yourself, preferably matching the generated file name |
 
 ## 🔧 Model Structure Configuration
 
@@ -23,15 +23,15 @@ We provide an optimized and simplified annotation pipeline that removes many red
 
 | Axis Type | Example | Description | Visualization |
 |-----------|---------|-------------|---------------|
-| **LINK0_ROT_AXIS** | `x` | In the local coordinate system of the rotating joint, the axis direction pointing horizontally rightward | ![LINK0_ROT_AXIS Example](LINK0_ROT_AXIS.jpg) |
-| **BASE_FRONT_AXIS** | `z` | In the local coordinate system of the laptop base link, the axis direction facing the front | ![BASE_FRONT_AXIS Example](BASE_FRONT_AXIS.jpg) |
-| **LINK0_CONTACT_AXIS** | `-x` | In the local coordinate system of the contact link, the axis direction pointing horizontally leftward | ![LINK0_CONTACT_AXIS Example](LINK0_CONTACT_AXIS.jpg) |
+| **LINK0_ROT_AXIS** | `-x` | In the local coordinate system of the rotating joint, the axis direction pointing horizontally leftward | ![LINK0_ROT_AXIS Example](LINK0_ROT_AXIS.jpg) |
+| **BASE_FRONT_AXIS** | `z` | In the local coordinate system of the oven base link, the axis direction facing the front | ![BASE_FRONT_AXIS Example](BASE_FRONT_AXIS.jpg) |
+| **LINK0_CONTACT_AXIS** | `-y` | In the local coordinate system of the contact link, the axis direction pointing vertically downward | ![LINK0_CONTACT_AXIS Example](LINK0_CONTACT_AXIS.jpg) |
 
 ## 📏 Physical Parameters
 
 | Parameter | Example | Description |
 |-----------|---------|-------------|
-| **SCALED_VOLUME** | `0.01` | Default value 0.01 for laptop objects |
+| **SCALED_VOLUME** | `0.02` | Default value 0.02 for oven objects |
 
 ---
 
@@ -39,7 +39,7 @@ We provide an optimized and simplified annotation pipeline that removes many red
 
 | Point Type | Description | Visualization |
 |------------|-------------|---------------|
-| First Point (articulated_object_head) | `Desired base position where the gripper contacts the laptop` | ![First Point Diagram](head.jpg) |
-| Second Point (articulated_object_tail) | `The line direction from the first point should be perpendicular to the laptop's rotation axis` | ![Second Point Diagram](tail.jpg) |
+| First Point (articulated_object_head) | `Desired base position where the gripper contacts the oven` | ![First Point Diagram](head.jpg) |
+| Second Point (articulated_object_tail) | `The line direction from the first point should be parallel to the oven's rotation axis` | ![Second Point Diagram](tail.jpg) |
 
 ---
