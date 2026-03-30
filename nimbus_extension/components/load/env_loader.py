@@ -9,6 +9,7 @@ from nimbus.daemon import ComponentStatus, StatusReporter
 from nimbus.daemon.decorators import status_monitor
 from nimbus.utils.flags import get_random_seed
 from workflows.base import create_workflow
+import os
 
 
 class EnvLoader(SceneLoader):
