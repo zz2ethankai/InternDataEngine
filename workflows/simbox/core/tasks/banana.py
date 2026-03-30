@@ -66,7 +66,14 @@ class BananaBaseTask(BaseTask):
         super().set_up_scene(scene)
         self._set_envmap()
         self.cfg = update_scenes(self.cfg)
+        print(f"[DEBUG] asset_root = {self.asset_root}")
+        from pxr import UsdGeom as _UsdGeom
+        print(f"[DIAG] stage metersPerUnit = {_UsdGeom.GetStageMetersPerUnit(self.stage)}")
+        print(f"[DIAG] stage upAxis = {_UsdGeom.GetStageUpAxis(self.stage)}")
+        print(f"[DEBUG] Loading {len(self.cfg['arena']['fixtures'])} fixtures...")
         for cfg in self.cfg["arena"]["fixtures"]:
+            usd_path = os.path.join(self.asset_root, cfg.get("path", "N/A"))
+            print(f"[DEBUG]   fixture '{cfg['name']}': class={cfg['target_class']}, usd={usd_path}, exists={os.path.exists(usd_path)}")
             self.fixtures[cfg["name"]] = self._load_obj(cfg)
             if cfg["target_class"] == "ConveyorObject":
                 self.conveyor_velocity = cfg["linear_velocity"][0]
@@ -74,11 +81,17 @@ class BananaBaseTask(BaseTask):
         self.cfg = update_rigid_objs(self.cfg)
         self.cfg = update_articulated_objs(self.cfg)
 
+        print(f"[DEBUG] Loading {len(self.cfg['objects'])} objects...")
         for cfg in self.cfg["objects"]:
+            usd_path = os.path.join(self.asset_root, cfg.get("path", "N/A"))
+            print(f"[DEBUG]   object '{cfg['name']}': class={cfg['target_class']}, usd={usd_path}, exists={os.path.exists(usd_path)}")
             self.objects[cfg["name"]] = self._load_obj(cfg)
 
+        print(f"[DEBUG] Loading {len(self.cfg['robots'])} robots...")
         for cfg in self.cfg["robots"]:
+            print(f"[DEBUG]   robot '{cfg['name']}': class={cfg.get('target_class', 'N/A')}")
             self._load_robot(cfg)
+        print(f"[DEBUG] Loading {len(self.cfg['cameras'])} cameras...")
         for cfg in self.cfg["cameras"]:
             self._load_camera(cfg)
             if cfg.get("apply_randomization", False):

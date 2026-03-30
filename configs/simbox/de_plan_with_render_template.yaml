@@ -10,7 +10,8 @@ load_stage:
         rendering_dt: 1/30                 # Render update rate
         stage_units_in_meters: 1.0         # Stage unit scale
         headless: True                     # Headless mode (no GUI); set false for visual debugging
-        anti_aliasing: 0                   # Anti-aliasing level
+        anti_aliasing: 0                   # Anti-aliasing level (0=off)
+        renderer: RayTracedLighting        # RayTracedLighting(快) or PathTracing(慢但真实)
   layout_random_generator:                 # Scene randomization
     type: env_randomizer
     args:
@@ -24,4 +25,5 @@ store_stage:
     type: env_writer
     args:
       batch_async: true                    # Async writes (better perf, more memory)
+      batch_size: 1                        # Write to disk every 1 sample (lower memory usage)
       output_dir: output/${name}/          # Output directory

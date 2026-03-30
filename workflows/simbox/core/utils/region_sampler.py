@@ -30,13 +30,27 @@ class RandomRegionSampler:
         bbox_tgt = compute_bbox(tgt.prim)
         tgt_center = (np.asarray(bbox_tgt.min) + np.asarray(bbox_tgt.max)) / 2
         tgt_z_max = bbox_tgt.max[2]
+
+        obj_local_pos = obj.get_local_pose()[0]
+        print(f"[DIAG] A_on_B_region_sampler: obj='{obj.name}', tgt='{tgt.name}'")
+        print(f"[DIAG]   tgt bbox: min={list(bbox_tgt.min)}, max={list(bbox_tgt.max)}")
+        print(f"[DIAG]   tgt_center={tgt_center}, tgt_z_max={tgt_z_max}")
+        print(f"[DIAG]   tgt prim_path={tgt.prim_path}")
+        print(f"[DIAG]   tgt local_pose={tgt.get_local_pose()}")
+        print(f"[DIAG]   tgt local_scale={tgt.get_local_scale()}")
+        print(f"[DIAG]   obj bbox: min={list(bbox_obj.min)}, max={list(bbox_obj.max)}")
+        print(f"[DIAG]   obj local_pose={obj.get_local_pose()}")
+        print(f"[DIAG]   obj_z_min={obj_z_min}, obj_local_z={obj_local_pos[2]}")
+        print(f"[DIAG]   shift={shift}")
+
         place_pos = np.zeros(3)
         place_pos[0] = tgt_center[0]
         place_pos[1] = tgt_center[1]
         place_pos[2] = (
-            tgt_z_max + (obj.get_local_pose()[0][2] - obj_z_min) + 0.001
+            tgt_z_max + (obj_local_pos[2] - obj_z_min) + 0.001
         )  # add a small value to avoid penetration
         place_pos += shift
+        print(f"[DIAG]   => place_pos={place_pos}")
         # Orientation
         yaw = np.random.uniform(*yaw_rotation)
         dr = R.from_euler("xyz", [0.0, 0.0, yaw], degrees=True)

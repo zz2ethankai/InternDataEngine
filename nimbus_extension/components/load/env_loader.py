@@ -71,6 +71,9 @@ class EnvLoader(SceneLoader):
             }
         )
 
+        import carb.settings
+        carb.settings.get_settings().set("/metricsAssembler/operationMode", 0)
+
         self.logger.info(f"simulator params: physics dt={physics_dt}, rendering dt={rendering_dt}")
         from omni.isaac.core import World
 

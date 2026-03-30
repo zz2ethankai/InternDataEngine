@@ -249,6 +249,15 @@ class TemplateController(BaseController):
         obstacles = self.usd_help.get_obstacles_from_stage(
             ignore_substring=self.ignore_substring, reference_prim_path=self.reference_prim_path
         ).get_collision_check_world()
+        print(f"[DEBUG] Controller '{self.name}' update(): ignore_substring={self.ignore_substring}")
+        print(f"[DEBUG]   obstacles cuboids: {len(obstacles.cuboid) if obstacles.cuboid else 0}")
+        print(f"[DEBUG]   obstacles meshes: {len(obstacles.mesh) if obstacles.mesh else 0}")
+        if obstacles.cuboid:
+            for c in obstacles.cuboid:
+                print(f"[DEBUG]     cuboid: {c.name}, pose={c.pose}")
+        if obstacles.mesh:
+            for m in obstacles.mesh:
+                print(f"[DEBUG]     mesh: {m.name}")
         if self.motion_gen is not None:
             self.motion_gen.update_world(obstacles)
         self.world_cfg = obstacles
@@ -401,6 +410,10 @@ class TemplateController(BaseController):
                         self.cmd_plan = cmd_plan.get_ordered_joint_state(self.raw_js_names)
                         self.num_plan_failed = 0
                     else:
+                        print(f"[DEBUG] Plan FAILED (batch). target_pos={ee_trans}, target_ori={ee_ori}")
+                        print(f"[DEBUG]   current_joints={sim_js.positions}")
+                        print(f"[DEBUG]   position_error={result.position_error}, rotation_error={result.rotation_error}")
+                        print(f"[DEBUG]   status={result.status}")
                         print("Plan did not converge to a solution.")
                         self.num_plan_failed += 1
                 else:
@@ -413,6 +426,10 @@ class TemplateController(BaseController):
                         self.cmd_plan = cmd_plan.get_ordered_joint_state(self.raw_js_names)
                         self.num_plan_failed = 0
                     else:
+                        print(f"[DEBUG] Plan FAILED (single). target_pos={ee_trans}, target_ori={ee_ori}")
+                        print(f"[DEBUG]   current_joints={sim_js.positions}")
+                        print(f"[DEBUG]   position_error={result.position_error}, rotation_error={result.rotation_error}")
+                        print(f"[DEBUG]   status={result.status}")
                         print("Plan did not converge to a solution.")
                         self.num_plan_failed += 1
             if self.cmd_plan and self._step_idx % 1 == 0:
@@ -528,6 +545,9 @@ class TemplateController(BaseController):
         if succ:
             print("Success")
             return 1
+        print(f"[DEBUG] test_single_forward FAILED. target_pos={ee_trans}, target_ori={ee_ori}")
+        print(f"[DEBUG]   current_joints={sim_js.positions}")
+        print(f"[DEBUG]   status={result.status}")
         print("Plan did not converge to a solution.")
         return 0
 
@@ -552,6 +572,9 @@ class TemplateController(BaseController):
                 self.ds_ratio = ds_ratio
                 cmd_time = N * dt / self.plan_config.time_dilation_factor / self.ds_ratio
                 return cmd_time, np.array(cmd_plan[-1].position.cpu())
+            print(f"[DEBUG] pre_forward FAILED (batch). target_pos={ee_trans}, target_ori={ee_ori}")
+            print(f"[DEBUG]   current_joints={sim_js.positions}, expected_js={expected_js}")
+            print(f"[DEBUG]   status={result.status}")
             print("Plan did not converge to a solution.")
             self.num_plan_failed = 1000
             return 0, expected_js
@@ -564,6 +587,10 @@ class TemplateController(BaseController):
             self.ds_ratio = ds_ratio
             cmd_time = N * dt / self.plan_config.time_dilation_factor / self.ds_ratio
             return cmd_time, np.array(cmd_plan[-1].position.cpu())
+        print(f"[DEBUG] pre_forward FAILED (single). target_pos={ee_trans}, target_ori={ee_ori}")
+        print(f"[DEBUG]   current_joints={sim_js.positions}, expected_js={expected_js}")
+        print(f"[DEBUG]   position_error={result.position_error}, rotation_error={result.rotation_error}")
+        print(f"[DEBUG]   status={result.status}")
         print("Plan did not converge to a solution.")
         self.num_plan_failed = 1000
         return 0, expected_js

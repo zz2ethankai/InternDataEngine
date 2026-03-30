@@ -70,6 +70,9 @@ class Pick(BaseSkill):
 
         # Update
         p_base_ee_cur, q_base_ee_cur = self.controller.get_ee_pose()
+        print(f"[DEBUG] Pick skill: pick_obj='{self.pick_obj.name}', ee_pos={p_base_ee_cur}, ee_ori={q_base_ee_cur}")
+        obj_pos, obj_ori = self.pick_obj.get_local_pose()
+        print(f"[DEBUG] Pick skill: obj_pos={obj_pos}, obj_ori={obj_ori}")
         cmd = (p_base_ee_cur, q_base_ee_cur, "update_pose_cost_metric", {"hold_vec_weight": None})
         manip_list.append(cmd)
 
@@ -85,6 +88,7 @@ class Pick(BaseSkill):
 
         # Pre grasp
         T_base_ee_grasps = self.sample_ee_pose()  # (N, 4, 4)
+        print(f"[DEBUG] Pick skill: sampled {T_base_ee_grasps.shape[0]} grasp candidates")
         T_base_ee_pregrasps = deepcopy(T_base_ee_grasps)
         self.controller.update_specific(
             ignore_substring=ignore_substring, reference_prim_path=self.controller.reference_prim_path

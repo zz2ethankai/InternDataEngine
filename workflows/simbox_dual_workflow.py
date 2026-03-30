@@ -113,6 +113,8 @@ class SimBoxDualWorkFlow(NimbusWorkFlow):
             physx_interface = acquire_physx_interface()
             physx_interface.overwrite_gpu_setting(1)
 
+        print(f"[DEBUG] Creating task: {self.task_cfg['task']}")
+        print(f"[DEBUG] Task asset_root: {self.task_cfg.get('asset_root', 'NOT SET')}")
         self.task = get_task_cls(self.task_cfg["task"])(self.task_cfg)
         self.stage = self.world.stage
         self.stage.SetDefaultPrim(self.stage.GetPrimAtPath("/World"))
@@ -223,19 +225,28 @@ class SimBoxDualWorkFlow(NimbusWorkFlow):
         controllers = {}
         for robot in task_cfg["robots"]:
             controllers[robot["name"]] = {}
+            print(f"[DEBUG] Initializing controllers for robot '{robot['name']}', robot_files={robot.get('robot_file', 'N/A')}")
             for robot_file in robot["robot_file"]:
                 controller_name = "left" if "left" in robot_file else "right"
-                controllers[robot["name"]][controller_name] = get_controller_cls(robot["target_class"])(
-                    name=robot["name"],
-                    robot_file=robot_file,
-                    constrain_grasp_approach=robot.get("constrain_grasp_approach", False),
-                    collision_activation_distance=robot.get("collision_activation_distance", 0.03),
-                    task=task,
-                    world=world,
-                    ignore_substring=robot.get("ignore_substring", ["material", "Plane", "conveyor", "scene", "table"]),
-                    use_batch=robot.get("use_batch", False),
-                )
-                controllers[robot["name"]][controller_name].reset()
+                print(f"[DEBUG]   controller '{controller_name}': robot_file={robot_file}, ignore={robot.get('ignore_substring', [])}")
+                try:
+                    controllers[robot["name"]][controller_name] = get_controller_cls(robot["target_class"])(
+                        name=robot["name"],
+                        robot_file=robot_file,
+                        constrain_grasp_approach=robot.get("constrain_grasp_approach", False),
+                        collision_activation_distance=robot.get("collision_activation_distance", 0.03),
+                        task=task,
+                        world=world,
+                        ignore_substring=robot.get("ignore_substring", ["material", "Plane", "conveyor", "scene", "table"]),
+                        use_batch=robot.get("use_batch", False),
+                    )
+                    controllers[robot["name"]][controller_name].reset()
+                    print(f"[DEBUG]   controller '{controller_name}' initialized OK")
+                except Exception as e:
+                    print(f"[DEBUG]   controller '{controller_name}' FAILED: {e}")
+                    import traceback
+                    traceback.print_exc()
+                    raise
         return controllers
 
     def _initialize_world_recorder(self):
@@ -431,12 +442,17 @@ class SimBoxDualWorkFlow(NimbusWorkFlow):
         return episode_success, should_continue
 
     def plan_first_skill(self, skills, should_continue):
-        for _, robot_skill_list in skills[0].items():
+        for robot_name, robot_skill_list in skills[0].items():
+            print(f"[DEBUG] plan_first_skill: robot='{robot_name}', num_lr_sequences={len(robot_skill_list[0])}")
             for lr_skill_list in robot_skill_list[0]:
+                skill_name = lr_skill_list[0].__class__.__name__ if lr_skill_list else "EMPTY"
+                print(f"[DEBUG]   first skill: {skill_name}")
                 lr_skill_list[0].simple_generate_manip_cmds()
+                print(f"[DEBUG]   manip_list length: {len(lr_skill_list[0].manip_list)}")
                 if hasattr(lr_skill_list[0], "visualize_target"):
                     lr_skill_list[0].visualize_target(self.world)
                 if len(lr_skill_list[0].manip_list) == 0:
+                    print(f"[DEBUG]   WARNING: empty manip_list, is_ready={lr_skill_list[0].is_ready()}")
                     should_continue = not lr_skill_list[0].is_ready()
         return should_continue
 
@@ -684,6 +700,7 @@ class SimBoxDualWorkFlow(NimbusWorkFlow):
         #     # self._init_static_objects(self.task)
         #     self.world.step(render=True)
 
+        print(f"[DEBUG] plan_with_render: starting main loop, max_episode_length={max_episode_length}")
         while not (step_id >= max_episode_length or (not self.skills and not episode_success) or (not should_continue)):
             obs = self.world.get_observations()
             action_dict = {}
@@ -703,6 +720,7 @@ class SimBoxDualWorkFlow(NimbusWorkFlow):
                         record_labels = [skill[0].is_record() for skill in skill_sequences[0] if skill[0]]
 
                         if False in feasible_labels:
+                            print(f"[DEBUG] step {step_id}: feasible check FAILED for robot '{robot_name}', stopping")
                             should_continue = False
                         if False in record_labels:
                             record_flag = False
@@ -737,6 +755,7 @@ class SimBoxDualWorkFlow(NimbusWorkFlow):
                 episode_success, should_continue = self.update_skill_states(
                     self.skills, episode_success, should_continue
                 )
+        print(f"[DEBUG] plan_with_render: loop ended at step {step_id}, success={episode_success}, continue={should_continue}")
 
         self.length = length
         if end:
