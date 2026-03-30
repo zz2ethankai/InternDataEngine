@@ -80,8 +80,8 @@ class SimBoxDualWorkFlow(NimbusWorkFlow):
         with open(arena_file_path, "r", encoding="utf-8") as arena_file:
             arena = yaml.load(arena_file, Loader=Loader)
 
-        if "involved_scenes" in arena:
-            arena["involved_scenes"] = self.scene_info
+        # if "involved_scenes" in arena:
+        #     arena["involved_scenes"] = self.scene_info
 
         self.task_cfg["arena"] = arena
 

@@ -46,6 +46,7 @@ class Close(BaseSkill):
         ]
         self.collision_valid = True
         self.process_valid = True
+        self.success_mode = self.planner_setting.get("success_mode", "zero")
 
     def setup_kpam(self):
         self.planner = KPAMPlanner(
@@ -190,5 +191,22 @@ class Close(BaseSkill):
             )
 
         curr_joint_p = self.art_obj._articulation_view.get_joint_positions()[:, self.art_obj.object_joint_index]
+        init_joint_p = self.art_obj.articulation_initial_joint_position
 
-        return np.abs(curr_joint_p) <= self.success_threshold and self.collision_valid and self.process_valid
+        print(
+            "curr_joint_p: ", curr_joint_p,
+            "init_joint_p: ", init_joint_p,
+            "distance: ", np.abs(curr_joint_p - init_joint_p),
+            "collision_valid :",
+            self.collision_valid,
+            "process_valid :",
+            self.process_valid,
+        )
+        if self.success_mode == "zero":
+            return np.abs(curr_joint_p) <= self.success_threshold and self.collision_valid and self.process_valid
+        elif self.success_mode == "dis_to_init":
+            return (
+                np.abs(curr_joint_p - init_joint_p) >= np.abs(self.success_threshold)
+                and self.collision_valid
+                and self.process_valid
+            )
